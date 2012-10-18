@@ -1,3 +1,5 @@
+/* Apex class to represent a Captricity Sheet object */
+
 public with sharing class CaptricitySheet {
     public String id { get; set; }
     public String pageNumber { get; set; }
@@ -5,6 +7,7 @@ public with sharing class CaptricitySheet {
     
     public CaptricitySheet() { this.fields = new List<CaptricityField>(); }
     
+    // Deprecated
     public String sheetInfo() {
         return id + ':' + pageNumber;
     }

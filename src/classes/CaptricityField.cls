@@ -1,3 +1,5 @@
+/* Apex class to represent a Field object in Captricity */
+
 public with sharing class CaptricityField {
     public String id { get; set; }
     public String name { get; set; }
@@ -6,11 +8,14 @@ public with sharing class CaptricityField {
     
     @future (callout=true)
     public static void fetchAndSyncFields(Map<Id, String> documentIds) {
+        // Fetch the document fields and sync by inserting in to the Salesforce DB
         List<CaptricityField> fieldList = new List<CaptricityField>();
         Set<String> existingFields = new Set<String>();
+        // Limit "Existing Fields" to the 7000 newest fields
         for (Captricity_Field__c f : [select Name from Captricity_Field__c order by Name desc limit 7000]) existingFields.add(f.Name);
 
         for (Id documentId : documentIds.keyset()) {
+            // The deep document resource in captricity contains ALL the fields of the document
             String deepDocumentJSON = CaptricityCalloutUtil.fetchDeepDocument(documentIds.get(documentId));
             if (deepDocumentJSON == null) continue; // Failed to fetch fields for this document, so do nothing
     

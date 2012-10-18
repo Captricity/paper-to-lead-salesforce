@@ -1,8 +1,10 @@
+/* Apex class to represent a Job object on Captricity, with some other metadata used in the Salesforce App */
+
 public class CaptricityJob {
     public String id { get; set; }
     public String name { get; set; }
-    public Boolean extracted { get; set; }
-    public Boolean readyToBeExtracted { get; set; }
+    public Boolean extracted { get; set; } // Has this job already been extracted?
+    public Boolean readyToBeExtracted { get; set; } // is this job ready to be extracted?
     public String document_id { get; set; }
     
     public static List<CaptricityJob> fetchCaptricityJobs() {
@@ -16,11 +18,14 @@ public class CaptricityJob {
         List<CaptricityJob> newJobs = parseJobListJSON(parser);
         
         Set<String> extractedJobs = new Set<String>();
+        // Get the most recent 5000 jobs. The Captricity_Job__c object only contains those jobs that have been extracted
         for (Captricity_Job__c job: [select Id__c from Captricity_Job__c order by Id__c desc limit 5000]) extractedJobs.add(String.valueof(job.Id__c.intValue()));
         Set<String> requiredLeadFields = new Set<String>();
+        // Lead fields that need to be defined to create a new lead
         requiredLeadFields.add('Last Name');
         requiredLeadFields.add('Company');
         Map<String, Integer> documentFieldRelationCount = new Map<String, Integer>();
+        // Walk through the field mappings to see if we have a field mapping defined for every required lead field
         for (Captricity__c fr : [select Captricity_Document__r.Id__c, Captricity_Field__c, Corresponding_Field_Name__c from Captricity__c where Object_Name__c='Lead']) {
             if (requiredLeadFields.contains(fr.Corresponding_Field_Name__c) && fr.Captricity_Field__c != null) {
                 String key = String.valueof(fr.Captricity_Document__r.Id__c.intValue());
@@ -34,6 +39,7 @@ public class CaptricityJob {
             }
         }
         
+        // Set metadata for better UI
         for (CaptricityJob job : newJobs) {
             if (extractedJobs.contains(job.id)) {
                 job.extracted = true;

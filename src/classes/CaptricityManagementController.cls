@@ -1,3 +1,5 @@
+/* Controller for the management page which lists the Document objects */
+
 public with sharing class CaptricityManagementController {
     public boolean authorized { get; set; }
     public String syncMessage { get; set; }
@@ -11,6 +13,7 @@ public with sharing class CaptricityManagementController {
     }
     
     public PageReference checkAuthorization() {
+        // Check to see if the app is authorized to access the user's data
         String signature = ApexPages.currentPage().getParameters().get('signature'); 
         if (signature != null) {
             return completeAuthorization(); // Probably a callback, so "redirect"
@@ -19,6 +22,7 @@ public with sharing class CaptricityManagementController {
         // Check if there is an entry for the API token. If there is, we are authorized.
         this.authorized = CaptricityAuthentication.authenticated();
         
+        // If we are authorized, automatically sync the documents
         if (this.authorized) {
             ApexPages.Message authorized = new ApexPages.Message(ApexPages.Severity.CONFIRM, System.Label.Authorized);
             ApexPages.addMessage(authorized);
@@ -32,6 +36,7 @@ public with sharing class CaptricityManagementController {
     }
     
     public PageReference completeAuthorization() {
+        // Complete the authorization request. This code should only be triggered if the user lands here after granting (or denying) access to the app on the Captricity request access page
         String signature = ApexPages.currentPage().getParameters().get('signature'); 
         if (signature == null) {
             // No signature, so probably no request so continue with nothing
@@ -72,6 +77,7 @@ public with sharing class CaptricityManagementController {
     }
     
     public PageReference sync() {
+        // Sync the documents, and let the user know how many more documents are left to sync
         Integer remainingSyncCount = CaptricityDocument.syncDocuments();
         if (remainingSyncCount > 0) {
             ApexPages.Message remainingSyncMessage = new ApexPages.Message(ApexPages.Severity.CONFIRM, String.format(System.Label.Remaining_Sync, new String[] {String.valueof(remainingSyncCount)}));
@@ -81,6 +87,7 @@ public with sharing class CaptricityManagementController {
         return null;
     }
     
+    // Navigate to the document view so that the user can define field mappings
     public PageReference navigateToView() {
         Captricity_Document__c doc;
         for (Captricity_Document__c d : this.documents) {

@@ -1,3 +1,5 @@
+/* Module for dealing with the extracted data */
+
 public with sharing class CaptricityDataset {
     public static Integer extractLeads(String jobId, String documentId) {
         // Extracts leads from this job. Returns number of leads inserted.
@@ -8,6 +10,7 @@ public with sharing class CaptricityDataset {
         return CaptricityDataset.parseDatasetResponseToLead(csvContent, documentId);
     }
         
+    // Clean up the csv row so it can be parsed. Adapted from http://wiki.developerforce.com/page/Code_Samples#Parse_a_CSV_with_APEX
     private static List<String> cleanCSVRow(String csvRow) {
         List<String> cleanFields = new List<String>();
         Boolean makeCompositeField = false;
@@ -35,6 +38,8 @@ public with sharing class CaptricityDataset {
         return cleanFields;
     }
     
+    // Parse the CSV export of the Captricity Job data to insert as Lead objects
+    // CSV parsing code adapted from http://wiki.developerforce.com/page/Code_Samples#Parse_a_CSV_with_APEX
     public static Integer parseDatasetResponseToLead(String csvContent, String documentId) {
         csvContent = csvContent.replaceAll(',"""', ',"DBLQT').replaceall('""",','DBLQT",');
         csvContent = csvContent.replaceAll('""', 'DBLQT');
@@ -44,6 +49,7 @@ public with sharing class CaptricityDataset {
         Integer emailIndex = null, firstNameIndex = null, lastNameIndex = null, companyIndex = null, phoneNumberIndex = null;
         
         List<String> fieldHeaders = cleanCSVRow(lines[0]);
+        // Get the column index of each lead field so that it can be related to the fieldRelation object
         Integer index = 0;
         for (String fieldHeader : fieldHeaders) {
             for (Captricity__c fieldRelation : fieldRelations) {
@@ -60,6 +66,7 @@ public with sharing class CaptricityDataset {
         }
         lines.remove(0);
         
+        // Email pattern
         String pat = '[a-zA-Z0-9\\.\\!\\#\\$\\%\\&\\*\\/\\=\\?\\^\\_\\+\\-\\`\\{\\|\\}\\~\'._%+-]+@[a-zA-Z0-9\\-.-]+\\.[a-zA-Z]+';
         List<Lead> newLeads = new List<Lead>();
         for (String line : lines) {

@@ -1,3 +1,5 @@
+/* Controller for the Captricity Jobs page */
+
 public with sharing class Captricity {
     public boolean authorized { get; set; }
     public String jobId { get; set; }

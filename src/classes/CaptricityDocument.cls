@@ -1,3 +1,5 @@
+/* Defines an Apex class to represent Captricity Documents */
+
 public with sharing class CaptricityDocument {
     public String id { get; set; }
     public String name { get; set; }
@@ -28,6 +30,7 @@ public with sharing class CaptricityDocument {
         for (CaptricityDocument doc: capDocs) {
             actualDocumentCount++;
             if (!syncedDocuments.contains(doc.id)) {
+                // Keep count of the prospective call out count, and limit to the number of callouts allowed
                 prospectiveCalloutCount += 1;
                 if (prospectiveCalloutCount < 10) {
                     newDocuments.add(new Captricity_Document__c(Name=doc.name, Id__c=Integer.valueof(doc.id)));
@@ -41,6 +44,7 @@ public with sharing class CaptricityDocument {
         insert newDocuments;
         List<Captricity__c> newFieldRelations = new List<Captricity__c>();
         for (Captricity_Document__c doc: newDocuments) {
+            // initialize field relations (mapping from lead fields to captricity fields) for this document
             newFieldRelations.add(new Captricity__c(Corresponding_Field_Name__c='First Name', Captricity_Document__c=doc.id, Object_Name__c='Lead'));
             newFieldRelations.add(new Captricity__c(Corresponding_Field_Name__c='Last Name', Captricity_Document__c=doc.id, Object_Name__c='Lead'));
             newFieldRelations.add(new Captricity__c(Corresponding_Field_Name__c='Company', Captricity_Document__c=doc.id, Object_Name__c='Lead'));
@@ -51,6 +55,8 @@ public with sharing class CaptricityDocument {
         insert newFieldRelations;
 
         CaptricityField.fetchAndSyncFields(newDocumentIds);
+
+        // Return the number of documents that still need to be synced
         return actualDocumentCount - syncedDocuments.size();
     }
     

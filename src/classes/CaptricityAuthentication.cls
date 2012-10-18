@@ -1,4 +1,6 @@
+/* Module for Authorizing access to Captricity */
 public class CaptricityAuthentication {
+    // Determines whether or not the app is authorized to access Captricity data
     public static Boolean authenticated() {
         Captricity_Token__c capTokens = Captricity_Token__c.getOrgDefaults();
         if (capTokens.Captricity__API_Token__c != null) {
@@ -8,10 +10,13 @@ public class CaptricityAuthentication {
         }
     }
     
+    // Initiate a new authorization request to Captricity
     public static String newAuthorization() {
         if (Captricity_App_Info__c.getOrgDefaults().Client_Id__c == null) {
+            // If there are no org defaults for Captricity App information, insert the default settings
             CaptricityCalloutUtil.insertDefaultSettings();
         }
+        // Construct the request url. See https://shreddr.captricity.com/developer/overview/#authentication for more information
         String baseURL = CaptricityCalloutUtil.HOST + '/accounts/request-access/';
         Map<String, String> requestParams = new Map<String, String>();
         requestParams.put('third-party-id', String.valueof(Captricity_App_Info__c.getOrgDefaults().Client_Id__c.intvalue()));
@@ -29,6 +34,7 @@ public class CaptricityAuthentication {
         return baseURL;
     }
     
+    // Verify response from Captricity by cross checking the signature
     public static boolean verifyRequest(Map<String, String> params) {
         String checkSignature = params.get('signature');
         params.remove('signature');
@@ -37,6 +43,7 @@ public class CaptricityAuthentication {
         return checkSignature == signature;
     }
     
+    // Helper method to construct a signed request to captricity given the query data as a HashMap
     private static String signedRequest(Map<String, String> kvPairs) {
         String signature = '';
         List<String> sortedKeys = new List<String>();

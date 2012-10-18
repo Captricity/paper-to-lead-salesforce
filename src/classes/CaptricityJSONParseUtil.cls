@@ -1,3 +1,5 @@
+/* Helper module for ignoring JSON objects and JSON Arrays by advancing the parser */
+
 public with sharing class CaptricityJSONParseUtil {
     public static void ignoreJSONObject(JSONParser parser) {
         // Advances the parser until the end of an object, given that the parser's current token is a START_OBJECT token

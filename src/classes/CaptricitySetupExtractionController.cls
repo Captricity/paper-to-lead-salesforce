@@ -1,3 +1,5 @@
+/* Controller for the setup extraction page (aka field mapping definition wizard) */
+
 public with sharing class CaptricitySetupExtractionController {
     private final Captricity_Document__c document;
     public String selectedField { get; set; }
@@ -7,6 +9,7 @@ public with sharing class CaptricitySetupExtractionController {
         document = (Captricity_Document__c)stdController.getRecord();
     }
     
+    // Get all the fields associated with the selected document
     public List<SelectOption> getFields() {
         List<Captricity_Field__c> fields = [select id, Field_Name__c from Captricity_Field__c where Captricity_Document__c = :document.id];
         List<SelectOption> options = new List<SelectOption>();
@@ -17,6 +20,7 @@ public with sharing class CaptricitySetupExtractionController {
         return options;
     }
     
+    // Update the field relations
     public void quickSaveField() {
         update document.captricity_field_relations__r;
     }
