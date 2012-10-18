@@ -1,0 +1,13 @@
+<apex:page standardcontroller="Captricity_Document__c" extensions="CaptricitySetupExtractionController">
+    <apex:form >
+        <apex:dataTable value="{!Captricity_Document__c.Captricity_Field_Relations__r}" var="fieldRelation" width="100%">
+            <apex:column headervalue="Lead Field Name" value="{!fieldRelation.Corresponding_Field_Name__c}" />
+            <apex:column headervalue="Corresponding Captricity Field">
+                <apex:selectList value="{!fieldRelation.Captricity_Field__c}" multiselect="false" size="1">
+                    <apex:selectOptions value="{!fields}" />
+                </apex:selectList>
+            </apex:column>
+        </apex:dataTable>
+        <apex:commandButton action="{!quicksaveField}" value="Update Lead Fields" />
+    </apex:form>
+</apex:page>

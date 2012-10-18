@@ -1,0 +1,19 @@
+<apex:page controller="Captricity" tabStyle="Captricity_Job__c" action="{!checkAuthorization}">
+  
+  <i><apex:outputText rendered="{!(!authorized)}" value="You are currently not authorized to access Captricity data. First, configure access to Captricity in Captricity Management" /></i>
+  <br />
+  
+  <apex:pageBlock title="Jobs">
+      <apex:dataTable value="{!captricityJobs}" var="job" width="100%">
+          <apex:column ><apex:facet name="header"><b>Name</b></apex:facet>{!job.name}</apex:column>
+          <apex:column ><apex:facet name="header"><b>Extracted</b></apex:facet>{!job.extracted}</apex:column>
+          <apex:column ><apex:facet name="header"><b>Actions</b></apex:facet>
+              <apex:form rendered="{!job.readyToBeExtracted}"><apex:commandLink action="{!extractLeads}" value="Extract Leads">
+                  <apex:param name="documentIdParam" value="{!job.document_id}" assignTo="{!documentId}" />
+                  <apex:param name="jobIdParam" value="{!job.id}" assignTo="{!jobId}" />
+              </apex:commandLink></apex:form>
+              <apex:outputText rendered="{!(!job.readyToBeExtracted)}" value="The document associated with this job does not have a field mapping for required Lead fields ('Last Name' and 'Company')" />
+          </apex:column>
+       </apex:dataTable>
+  </apex:pageBlock>
+</apex:page>

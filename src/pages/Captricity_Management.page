@@ -1,0 +1,36 @@
+<apex:page controller="CaptricityManagementController" action="{!checkAuthorization}">
+  <apex:pageBlock >	
+  	<apex:sectionHeader title="Captricity" subtitle="Configuration & Settings" />
+  	<apex:pagemessages />
+  	<apex:pageBlockSection columns="1">
+  		<apex:outputText value="Configure authentication, scheduling and other settings information for Captricity" style="font-style:italic;" />
+  	</apex:pageBlockSection>
+  	
+  	<apex:TabPanel switchtype="client" value="{!selectedTab}" id="tabpanel">
+  		<apex:tab label="Recent Documents" name="recent_document_settings">
+  			<apex:form >
+			    <apex:commandButton rendered="{!authorized}" action="{!sync}" value="Re-Sync" />
+			    <br />
+  				<apex:outputPanel id="documentsPanel">
+  					<apex:pageBlockSection title="Current Captricity Documents" collapsible="false">
+  						<apex:pageBlockTable var="document" value="{!documents}">
+  							<apex:column >
+  								<apex:facet name="header">Document Name</apex:facet>
+  								<apex:commandlink action="{!navigateToView}" value="{!document.Name}">
+  									<apex:param name="selectedDocumentIdParam" value="{!document.id}" assignTo="{!selectedDocumentId}" />
+								</apex:commandlink>
+  							</apex:column>
+  						</apex:pageBlockTable>
+  					</apex:pageBlockSection>
+  				</apex:outputPanel>
+  			</apex:form>
+  		</apex:tab>
+  		
+  		<apex:tab label="Authentication" name="authentication_settings">
+		  <apex:form >
+		    <apex:commandButton action="{!authorize}" value="{!IF(authorized, "Re-Authenticate", "Authenticate")}" />
+		  </apex:form>
+	  </apex:tab>
+    </apex:TabPanel>
+  </apex:PageBlock>
+</apex:page>
