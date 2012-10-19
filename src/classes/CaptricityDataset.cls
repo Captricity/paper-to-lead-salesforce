@@ -16,7 +16,18 @@ public with sharing class CaptricityDataset {
         Boolean makeCompositeField = false;
         String compositeField;
         for (String field : csvRow.split(',')) {
-            if (field.startsWith('"') && field.endsWith('"')) {
+            if (field == '"') {
+                // Since we already have a composite field going, this quote is the end of the composite field
+                if (makeCompositeField) {
+                    compositeField += ',' + field;
+                    cleanFields.add(compositeField.replaceAll('DBLQT', '"'));
+                    makeCompositeField = false;
+                } else {
+                    // This means the quote is the beginning of a composite field
+                    makeCompositeField = true;
+                    compositeField = field;
+                }
+            } else if (field.startsWith('"') && field.endsWith('"')) {
                 cleanFields.add(field.replaceAll('DBLQT', '"'));
             }
             else if (field.startsWith('"')) {
